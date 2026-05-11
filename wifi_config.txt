@@ -1,0 +1,3 @@
+enabled=1
+ssid=CHANGE_ME_SSID
+password=CHANGE_ME_PASSWORD
