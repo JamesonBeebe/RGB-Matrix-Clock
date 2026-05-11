@@ -50,9 +50,9 @@ class DISPLAYSUBSYSTEM:
         line2.scale = 2
         line3.scale = 1
         line4.scale = 1
-        line1.x = 3
+        line1.x = 6
         line1.y = 8
-        line2.x = 3
+        line2.x = 6
         line2.y = 24
         line3.x = 39
         line3.y = 5
@@ -84,6 +84,8 @@ class DISPLAYSUBSYSTEM:
             line2.text = "BEEP SET"
         if _selectSettingOptions == 3:
             line2.text = "autolight"
+        if _selectSettingOptions == 4:
+            line2.text = "BRIGHT"
         if firstEnteringPageFlag == 0:
             firstEnteringPageFlag = 1
             
@@ -159,6 +161,16 @@ class DISPLAYSUBSYSTEM:
                 line2.text = "  on"
                 line3.text = "> off"
                 
+    def brightnessPage(self,line2,line3,_brightnessLevel):
+        line2.scale = 1
+        line3.scale = 1
+        line2.x = 8
+        line2.y = 9
+        line3.x = 20
+        line3.y = 24
+        line2.text = "BRIGHTNESS"
+        line3.text = "%02d" % _brightnessLevel
+
         
     
     def setDateTime(self,_selectSettingOptions,_dateTemp,_timeTemp):

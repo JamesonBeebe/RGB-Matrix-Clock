@@ -7,6 +7,7 @@ import adafruit_display_text.label
 import adafruit_imageload
 import barkManager
 import board
+import brightnessManager
 import displayio
 import framebufferio
 import rgbmatrix
@@ -30,11 +31,11 @@ KEY_UP = 2
 SPLASH_BITMAP = "/startup.bmp"
 LOGO_BITMAP = "/logo.bmp"
 SPLASH_SECONDS = 3
-LOGO_X = 50
+LOGO_X = 40
 LOGO_Y = 18
-WIFI_STATUS_X = 44
-WIFI_STATUS_Y = 26
-WEATHER_STATUS_X = 38
+WIFI_STATUS_X = 57
+WIFI_STATUS_Y = 19
+WEATHER_STATUS_X = 57
 WEATHER_STATUS_Y = 26
 NTP_SYNC_SECONDS = 21600
 WEATHER_UPDATE_SECONDS = 1800
@@ -51,6 +52,7 @@ startBeepFlag = 0
 beepCount = 0
 
 autoLightFlag = 0
+brightnessLevel = brightnessManager.loadLevel()
 
 selectSettingOptions = 0
 pageID = 0
@@ -113,6 +115,7 @@ matrix = rgbmatrix.RGBMatrix(
 # Associate the RGB matrix with a Display so that we can use displayio features
 display = framebufferio.FramebufferDisplay(matrix, auto_refresh=True)
 display.rotation = 0
+display.brightness = brightnessManager.levelToBrightness(brightnessLevel)
 
 
 def setDisplayGroup(group):
@@ -357,7 +360,9 @@ def checkLightSensor():
         if lightSensorValue > 2800:
             display.brightness = 0.0
         else:
-            display.brightness = 0.1
+            display.brightness = brightnessManager.levelToBrightness(brightnessLevel)
+    else:
+        display.brightness = brightnessManager.levelToBrightness(brightnessLevel)
 
 
 def judgmentBuzzerSwitch():
@@ -399,11 +404,11 @@ def keyMenuProcessingFunction():
 
 
 def keyDownProcessingFunction():
-    global selectSettingOptions, timeTemp, dateTemp, beepFlag, autoLightFlag
+    global selectSettingOptions, timeTemp, dateTemp, beepFlag, autoLightFlag, brightnessLevel
     if pageID == 1:
         selectSettingOptions -= 1
         if selectSettingOptions == -1:
-            selectSettingOptions = 3
+            selectSettingOptions = 4
     if pageID == 2:
         if selectSettingOptions == 0:  # 选择列表为时间设置（0）
             # 对时间进行设置
@@ -445,13 +450,17 @@ def keyDownProcessingFunction():
                 autoLightFlag = 0
             else:
                 autoLightFlag = 1
+        if selectSettingOptions == 4:
+            brightnessLevel -= 1
+            brightnessLevel = brightnessManager.clampLevel(brightnessLevel)
+            display.brightness = brightnessManager.levelToBrightness(brightnessLevel)
 
 
 def keyUpProcessingFunction():
-    global selectSettingOptions, timeTemp, dateTemp, beepFlag, autoLightFlag
+    global selectSettingOptions, timeTemp, dateTemp, beepFlag, autoLightFlag, brightnessLevel
     if pageID == 1:
         selectSettingOptions += 1
-        if selectSettingOptions == 4:
+        if selectSettingOptions == 5:
             selectSettingOptions = 0
     if pageID == 2:
         if selectSettingOptions == 0:  # 选择列表为时间设置（0）
@@ -494,6 +503,10 @@ def keyUpProcessingFunction():
                 autoLightFlag = 0
             else:
                 autoLightFlag = 1
+        if selectSettingOptions == 4:
+            brightnessLevel += 1
+            brightnessLevel = brightnessManager.clampLevel(brightnessLevel)
+            display.brightness = brightnessManager.levelToBrightness(brightnessLevel)
 
 
 def keyExitProcessingFunction():
@@ -501,6 +514,8 @@ def keyExitProcessingFunction():
     if pageID == 2 and selectSettingOptions <= 1:  # 如果设置了时间或日期，退出时写入RTC
         showSystem.setDateTime(selectSettingOptions, dateTemp, timeTemp)
         timeSettingLabel = 0
+    if pageID == 2 and selectSettingOptions == 4:
+        brightnessManager.saveLevel(brightnessLevel)
     pageID -= 1
     if pageID < 0:
         pageID = 0
@@ -592,3 +607,6 @@ while True:
         showSystem.onOffPage(
             line2, line3, selectSettingOptions, beepFlag, autoLightFlag
         )
+    if pageID == 2 and selectSettingOptions == 4:
+        line1.text = ""
+        showSystem.brightnessPage(line2, line3, brightnessLevel)

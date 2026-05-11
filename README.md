@@ -39,6 +39,7 @@ Available settings:
 - `DATE SET`: manually set year, month, day
 - `BEEP SET`: enable or disable button beeps and the dog bark
 - `autolight`: enable or disable automatic brightness
+- `BRIGHT`: adjust display brightness from 1 to 10
 
 Use `UP` and `DOWN` to move through the settings list. Press `MENU` to enter the selected setting.
 
@@ -111,6 +112,7 @@ Important files:
 - `wifi_config.txt`: saved Wi-Fi credentials
 - `location_config.txt`: latitude, longitude, timezone
 - `bark_config.txt`: hourly dog bark schedule
+- `brightness_config.txt`: display brightness level from 1 to 10
 - `startup.bmp`: Jedi Dog startup/hourly splash image
 - `logo.bmp`: company logo
 - `boot.py`: controls whether the Pico or computer can write to the filesystem
@@ -127,6 +129,22 @@ To make the `CIRCUITPY` drive writable from your computer:
 4. The computer should now be able to edit files on `CIRCUITPY`.
 
 If you are using Mu Editor, open the Serial console and press `Ctrl+C` to stop the running program and enter the REPL.
+
+## Brightness
+
+Brightness is stored in:
+
+```text
+brightness_config.txt
+```
+
+Default:
+
+```text
+level=3
+```
+
+Use the `BRIGHT` menu to adjust brightness from 1 to 10. Long-press `UP` to save and go back. If `autolight` is enabled, the light sensor can dim the display, but this brightness level is still used as the normal on-brightness.
 
 ## Dog Bark Schedule
 
